@@ -1,0 +1,9 @@
+#ifndef __PINS_H_
+#define __PINS_H_
+#define WIND_SPEED_METER_PIN 13
+#define HUMID_TEMP_SDA 18
+#define HUMID_TEMP_SCL 19
+
+
+
+#endif // __PINS_H_
