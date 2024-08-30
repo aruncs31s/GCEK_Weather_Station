@@ -1,0 +1,2 @@
+# ESP32_MeshNet_For_Node_To_Gateway_Communication
+Esp32 Based MeshNet using ESPNOW For Constant Environmental Monitoring
