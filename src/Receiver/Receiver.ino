@@ -1,19 +1,26 @@
 #include <esp_now.h>
 #include <esp_wifi.h>
 #include <WiFi.h>
+#include <ThingSpeak.h>
 // #include "lib/sensors.h"
 // uint8_t broadcastAddress[] = {0x08, 0xD1, 0xF9, 0xED, 0x30, 0xD8};
 const char* ssid     = "802.11";
 const char* password = "12345678p";
+const int channel = 2642690;
+int t_status;
+// For Thingspeak
+WiFiClient  client;
 uint8_t wifiChannel = 6;
+
 
 typedef struct Data {
   uint8_t UID;
-  char someChar[50];
   float light_sensor_value;
-  long int wind_count;
   float wind_speed;
-  int y;
+  float wind_direction;
+  float humidity;
+  float temperature;
+  float rain_volume;
 } Data;
 // Create struct same as Sender
 Data Message;
@@ -38,7 +45,6 @@ void OnReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int len) {
 }
 void setup(){
 Serial.begin(9600);
-
 // Ignore this and get Contant Reboot :)
  WiFi.mode(WIFI_AP_STA);
   
@@ -49,16 +55,17 @@ Serial.begin(9600);
     Serial.println("Error initializing ESP-NOW");
     return;
   }
-  // WiFi.begin(ssid,password);
-  // while (WiFi.status() != WL_CONNECTED) {
-  //   delay(500);
-  //   Serial.print(".");
-  // }
+  WiFi.begin(ssid,password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
   Serial.println("");
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
- 
+
+ ThingSpeak.begin(client); 
   
   // Once ESPNow is successfully Init, we will register for recv CB to
   // get recv packer info
@@ -69,8 +76,37 @@ void loop(){
 
   // Update the structures with the new incoming data
   whole_data[Message.UID-1].light_sensor_value = Message.light_sensor_value;
-  Serial.printf("x value: %f \n", whole_data[Message.UID-1].light_sensor_value);
-  // Serial.printf("y value: %d \n", boardsStruct[Message.UID-1].y);
-  // Serial.println();
-  delay(1000);
+  whole_data[Message.UID-1].temperature = Message.temperature;
+  whole_data[Message.UID-1].humidity = Message.humidity;
+  whole_data[Message.UID-1].wind_speed = Message.wind_speed;
+  whole_data[Message.UID-1].wind_direction = Message.wind_direction;
+  whole_data[Message.UID-1].rain_volume = Message.rain_volume;
+
+t_status = 
+  ThingSpeak.writeField(channel,1,Message.light_sensor_value,apiKey);
+  delay(100);
+ t_status = 
+  ThingSpeak.writeField(channel,2,Message.humidity,apiKey);
+  delay(100);
+
+ t_status = 
+  ThingSpeak.writeField(channel,3,Message.temperature,apiKey);
+  delay(100);
+ t_status = 
+  ThingSpeak.writeField(channel,4,Message.wind_speed,apiKey);
+  delay(100);
+t_status = 
+  ThingSpeak.writeField(channel,5,Message.wind_direction,apiKey);
+  delay(100);
+ t_status = 
+  ThingSpeak.writeField(channel,6,Message.rain_volume,apiKey);
+
+  Serial.printf("light value: %f \n", whole_data[Message.UID-1].light_sensor_value);
+  Serial.printf("temp value: %f \n", whole_data[Message.UID-1].temperature);
+  Serial.printf("humid value: %f \n", whole_data[Message.UID-1].humidity);
+  Serial.printf("speed value: %f \n", whole_data[Message.UID-1].wind_speed);
+  Serial.printf("direction value: %f \n", whole_data[Message.UID-1].wind_direction);
+  Serial.printf("rain value: %f \n", whole_data[Message.UID-1].rain_volume);
+
+  delay(3000);
 }

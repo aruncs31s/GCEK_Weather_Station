@@ -1,5 +1,8 @@
 #ifndef __PINS_H_
+#define __PINS_H_
 
-#define WIND_SPEED_METER_PIN 13
+const int PIN_WIND_DIRECTION = 32;
+const int PIN_WIND_SPEED = 34;
+const int PIN_RAINFALL =  35;
 
-#endif
+#endif // __PINS_H_

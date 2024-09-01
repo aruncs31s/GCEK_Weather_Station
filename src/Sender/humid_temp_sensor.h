@@ -13,7 +13,7 @@
 #include <Wire.h>
 
 
-class HumidTempSensor{
+class humidTempSensor{
   public:
   /* begin() 
   - returs nothing

@@ -26,7 +26,6 @@ void espMesh::mesh::init() {
   }
 }
 void espMesh::wifi::begin(uint8_t channel) {
-  WiFi.mode(WIFI_STA);
   esp_wifi_set_promiscuous(true);
   esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
   esp_wifi_set_promiscuous(false);
