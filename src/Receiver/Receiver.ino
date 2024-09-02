@@ -1,16 +1,11 @@
-#include <esp_now.h>
-#include <esp_wifi.h>
+// Static IP Wifi 
 #include <WiFi.h>
-#include <ThingSpeak.h>
-// #include "lib/sensors.h"
-// uint8_t broadcastAddress[] = {0x08, 0xD1, 0xF9, 0xED, 0x30, 0xD8};
+
 const char* ssid     = "802.11";
 const char* password = "12345678p";
-const int channel = 2642690;
-int t_status;
-// For Thingspeak
-WiFiClient  client;
+
 uint8_t wifiChannel = 6;
+
 
 
 typedef struct Data {
@@ -22,6 +17,7 @@ typedef struct Data {
   float temperature;
   float rain_volume;
 } Data;
+
 // Create struct same as Sender
 Data Message;
 
