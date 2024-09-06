@@ -110,7 +110,6 @@ void loop() {
               client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
               client.println("</style></head>");
               client.println("<body><h1>GCEK Weather Station</h1>");
-              
             client.println("<h3> Station IP :  " +  String(WiFi.localIP().toString()) +  "</h3>");
               client.println("<p id='temperature'>Temperature: " + String(Message.temperature) + " (degree) C</p>");
               client.println("<p id='humidity'>Humidity: " + String(Message.humidity) + " %</p>");
@@ -151,87 +150,3 @@ void loop() {
       }
       }
       }
-//    
-// void loop(){
-// // Get readings from humidity and temp sensor
-// Humid_Temp_Sensor.get_readings();
-// Message.light_sensor_value = Light_Sensor.get_value();
-// Message.temperature = Humid_Temp_Sensor.temperature;
-// Message.humidity = Humid_Temp_Sensor.humidity;
-// Message.wind_speed = Weather_Station.get_speed();
-// Message.wind_direction = Weather_Station.get_direction();
-// Message.rain_volume= Weather_Station.get_rain();
-// // Serial.println("Direction ");
-// // Serial.print(Message.wind_direction);
-//  WiFiClient client = server.available();
-//   
-//   if (client) {
-//     Serial.println("New Client.");
-//     String currentLine = "";
-//     while (client.connected()) {
-//       if (client.available()) {
-//         char c = client.read();
-//         Serial.write(c);
-//         header += c;
-//         
-//         if (c == '\n') {
-//           if (currentLine.length() == 0) {
-//             // HTTP Headers
-//             client.println("HTTP/1.1 200 OK");
-//             client.println("Content-type:text/html");
-//             client.println("Connection: close");
-//             client.println();
-//
-//             // Send the HTML structure only once
-//             client.println("<!DOCTYPE html><html>");
-//             client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-//             client.println("<link rel=\"icon\" href=\"data:,\">");
-//             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
-//             client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
-//             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-//             client.println(".button2 {background-color: #555555;}</style></head>");
-//             
-//             client.println("<body><h1>GCEK Weather Station</h1>");
-//             client.println("<h3>Station IP: " + String(WiFi.localIP().toString()) + "</h3>");
-//             client.println("<div id=\"data\"></div>");
-//             
-//             // Add a JavaScript to refresh the data every 5 seconds
-//             client.println("<script>");
-//             client.println("setInterval(function() {");
-//             client.println("fetch('/data').then(function(response) { return response.text(); }).then(function(text) { document.getElementById('data').innerHTML = text; });");
-//             client.println("}, 5000);"); // 5000ms = 5 seconds
-//             client.println("</script>");
-//             
-//             client.println("</body></html>");
-//             client.println();
-//             break;
-//           } else {
-//             currentLine = "";
-//           }
-//         } else if (c != '\r') {
-//           currentLine += c;
-//         }
-//       }
-//     }
-//     header = "";
-//     client.stop();
-//     Serial.println("Client disconnected.");
-//     Serial.println("");
-//   }
-//   
-//   // Handle AJAX request to send sensor data
-//   if (header.indexOf("GET /data") >= 0) {
-//     String dataResponse = "<p>Temperature: " + String(Message.temperature) + " °C</p>";
-//     dataResponse += "<p>Humidity: " + String(Message.humidity) + " %</p>";
-//     dataResponse += "<p>Wind Speed: " + String(Message.wind_speed) + " kph</p>";
-//     dataResponse += "<p>Wind Direction: " + String(Message.wind_direction) + "</p>";
-//     dataResponse += "<p>Total Rainfall: " + String(Message.rain_volume) + " mm</p>";
-//     dataResponse += "<p>Light Intensity: " + String(Message.light_sensor_value) + "</p>";
-//
-//     client.print("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\n");
-//     client.print(dataResponse);
-//     client.stop();
-//   }
-// }
-//
-//
