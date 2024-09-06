@@ -59,79 +59,179 @@ void setup(){
   server.begin();
 }
 
-void loop(){
-// Get readings from humidity and temp sensor
-Humid_Temp_Sensor.get_readings();
-Message.light_sensor_value = Light_Sensor.get_value();
-Message.temperature = Humid_Temp_Sensor.temperature;
-Message.humidity = Humid_Temp_Sensor.humidity;
-Message.wind_speed = Weather_Station.get_speed();
-Message.wind_direction = Weather_Station.get_direction();
-Message.rain_volume= Weather_Station.get_rain();
-// Serial.println("Direction ");
-// Serial.print(Message.wind_direction);
-delay(1000);
+void loop() {
+  Humid_Temp_Sensor.get_readings();
+  Message.light_sensor_value = Light_Sensor.get_value();
+  Message.temperature = Humid_Temp_Sensor.temperature;
+  Message.humidity = Humid_Temp_Sensor.humidity;
+  Message.wind_speed = Weather_Station.get_speed();
+  Message.wind_direction = Weather_Station.get_direction();
+  Message.rain_volume = Weather_Station.get_rain();
 
- WiFiClient client = server.available();
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  WiFiClient client = server.available();
 
-
-
-
-if (client) {
- currentTime = millis();
+  if (client) {
+    currentTime = millis();
     previousTime = currentTime;
     Serial.println("New Client.");
     String currentLine = "";
     while (client.connected() && currentTime - previousTime <= timeoutTime) {
       currentTime = millis();
       if (client.available()) {
-      char c = client.read();
+        char c = client.read();
         Serial.write(c);
         header += c;
         if (c == '\n') {
           if (currentLine.length() == 0) {
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("Connection: close");
-            client.println();
+            if (header.indexOf("GET /data") >= 0) {
+              client.println("HTTP/1.1 200 OK");
+              client.println("Content-Type: application/json");
+              client.println("Connection: close");
+              client.println();
+              client.print("{");
+              client.print("\"temperature\":"); client.print(Message.temperature); client.print(",");
+              client.print("\"humidity\":"); client.print(Message.humidity); client.print(",");
+              client.print("\"wind_speed\":"); client.print(Message.wind_speed); client.print(",");
+              client.print("\"wind_direction\":"); client.print(Message.wind_direction); client.print(",");
+              client.print("\"rain_volume\":"); client.print(Message.rain_volume); client.print(",");
+              client.print("\"light_sensor_value\":"); client.print(Message.light_sensor_value);
+              client.println("}");
+              client.println();
+              break;
+            } else {
+              client.println("HTTP/1.1 200 OK");
+              client.println("Content-type:text/html");
+              client.println("Connection: close");
+              client.println();
 
-            client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            client.println("<link rel=\"icon\" href=\"data:,\">");
-            client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
-            client.println("</style></head>");
+              client.println("<!DOCTYPE html><html>");
+              client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
+              client.println("<link rel=\"icon\" href=\"data:,\">");
+              client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
+              client.println("</style></head>");
+              client.println("<body><h1>GCEK Weather Station</h1>");
+              
+            client.println("<h3> Station IP :  " +  String(WiFi.localIP().toString()) +  "</h3>");
+              client.println("<p id='temperature'>Temperature: " + String(Message.temperature) + " (degree) C</p>");
+              client.println("<p id='humidity'>Humidity: " + String(Message.humidity) + " %</p>");
+              client.println("<p id='wind_speed'>Wind Speed: " + String(Message.wind_speed) + " kph </p>");
+              client.println("<p id='wind_direction'>Wind Direction: " + String(Message.wind_direction) + "(degrees) </p>");
+              client.println("<p id='rain_volume'>Total Rain Fall: " + String(Message.rain_volume) + " mm</p>");
+              client.println("<p id='light_intensity'>Light Intensity: " + String(Message.light_sensor_value) + "</p>");
+              client.println("<script>");
+              client.println("setInterval(function() {");
+              client.println("  var xhr = new XMLHttpRequest();");
+              client.println("  xhr.onreadystatechange = function() {");
+              client.println("    if (xhr.readyState == 4 && xhr.status == 200) {");
+              client.println("      var data = JSON.parse(xhr.responseText);");
+              client.println("      document.getElementById('temperature').innerHTML = 'Temperature: ' + data.temperature + ' (degree)C';");
+              client.println("      document.getElementById('humidity').innerHTML = 'Humidity: ' + data.humidity + ' %';");
+              client.println("      document.getElementById('wind_speed').innerHTML = 'Wind Speed: ' + data.wind_speed + ' kph';");
+              client.println("      document.getElementById('wind_direction').innerHTML = 'Wind Direction: ' + data.wind_direction;");
+              client.println("      document.getElementById('rain_volume').innerHTML = 'Total Rain Fall: ' + data.rain_volume + ' mm';");
+              client.println("      document.getElementById('light_intensity').innerHTML = 'Light Intensity: ' + data.light_sensor_value;");
+              client.println("    }");
+              client.println("  };");
+              client.println("  xhr.open('GET', '/data', true);");
+              client.println("  xhr.send();");
+              client.println("}, 5000);");
+              client.println("</script>");
 
-            client.println("<body><h1>GCEK Weather Station</h1>");
-            client.println("<body><h3> Station IP :  " +  String(WiFi.localIP().toString()) +  "</h3>");
-
-            client.println("<p>Temperature  " + String(Message.temperature) + " degree C</p>");
-            client.println("<p>humidity " + String(Message.humidity) + "</p>");
-            client.println("<p>Wind Speed  " + String(Message.wind_speed) + " (kph) </p>");
-            client.println("<p>Wind Direction  " + String(Message.wind_direction) + "</p>");
-            client.println("<p>Total Rain Fall " +String(Message.rain_volume) + " (mm)  </p>");
-            client.println("<p>Light Intensity " + String(Message.light_sensor_value)+ "</p>");
-
-            client.println("</body></html>");
-
-            client.println();
-            break;
+              client.println("</body></html>");
+              client.println();
+              break;
+            }
           } else {
-          currentLine = "";
+            currentLine = "";
           }
         } else if (c != '\r') {
           currentLine += c;
         }
       }
-    }
-    header = "";
-    client.stop();
-    Serial.println("Client disconnected.");
-    Serial.println("");
-  }
-
-
-}
-
-
+      }
+      }
+      }
+//    
+// void loop(){
+// // Get readings from humidity and temp sensor
+// Humid_Temp_Sensor.get_readings();
+// Message.light_sensor_value = Light_Sensor.get_value();
+// Message.temperature = Humid_Temp_Sensor.temperature;
+// Message.humidity = Humid_Temp_Sensor.humidity;
+// Message.wind_speed = Weather_Station.get_speed();
+// Message.wind_direction = Weather_Station.get_direction();
+// Message.rain_volume= Weather_Station.get_rain();
+// // Serial.println("Direction ");
+// // Serial.print(Message.wind_direction);
+//  WiFiClient client = server.available();
+//   
+//   if (client) {
+//     Serial.println("New Client.");
+//     String currentLine = "";
+//     while (client.connected()) {
+//       if (client.available()) {
+//         char c = client.read();
+//         Serial.write(c);
+//         header += c;
+//         
+//         if (c == '\n') {
+//           if (currentLine.length() == 0) {
+//             // HTTP Headers
+//             client.println("HTTP/1.1 200 OK");
+//             client.println("Content-type:text/html");
+//             client.println("Connection: close");
+//             client.println();
+//
+//             // Send the HTML structure only once
+//             client.println("<!DOCTYPE html><html>");
+//             client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
+//             client.println("<link rel=\"icon\" href=\"data:,\">");
+//             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
+//             client.println(".button { background-color: #4CAF50; border: none; color: white; padding: 16px 40px;");
+//             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
+//             client.println(".button2 {background-color: #555555;}</style></head>");
+//             
+//             client.println("<body><h1>GCEK Weather Station</h1>");
+//             client.println("<h3>Station IP: " + String(WiFi.localIP().toString()) + "</h3>");
+//             client.println("<div id=\"data\"></div>");
+//             
+//             // Add a JavaScript to refresh the data every 5 seconds
+//             client.println("<script>");
+//             client.println("setInterval(function() {");
+//             client.println("fetch('/data').then(function(response) { return response.text(); }).then(function(text) { document.getElementById('data').innerHTML = text; });");
+//             client.println("}, 5000);"); // 5000ms = 5 seconds
+//             client.println("</script>");
+//             
+//             client.println("</body></html>");
+//             client.println();
+//             break;
+//           } else {
+//             currentLine = "";
+//           }
+//         } else if (c != '\r') {
+//           currentLine += c;
+//         }
+//       }
+//     }
+//     header = "";
+//     client.stop();
+//     Serial.println("Client disconnected.");
+//     Serial.println("");
+//   }
+//   
+//   // Handle AJAX request to send sensor data
+//   if (header.indexOf("GET /data") >= 0) {
+//     String dataResponse = "<p>Temperature: " + String(Message.temperature) + " °C</p>";
+//     dataResponse += "<p>Humidity: " + String(Message.humidity) + " %</p>";
+//     dataResponse += "<p>Wind Speed: " + String(Message.wind_speed) + " kph</p>";
+//     dataResponse += "<p>Wind Direction: " + String(Message.wind_direction) + "</p>";
+//     dataResponse += "<p>Total Rainfall: " + String(Message.rain_volume) + " mm</p>";
+//     dataResponse += "<p>Light Intensity: " + String(Message.light_sensor_value) + "</p>";
+//
+//     client.print("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\n");
+//     client.print(dataResponse);
+//     client.stop();
+//   }
+// }
+//
+//
