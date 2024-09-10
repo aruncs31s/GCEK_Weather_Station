@@ -42,7 +42,7 @@ weatherStation Weather_Station;
 void reconnect(){
 if ((WiFi.status()) != WL_CONNECTED ){
   WiFi.disconnect();
-  delay(100);
+  delay(1000);
   WiFi.reconnect();
 }
 }
