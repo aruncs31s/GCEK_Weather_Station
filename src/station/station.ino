@@ -81,7 +81,7 @@ void loop() {
 
   WiFiClient client = server.available();
 
-  if (client) {
+  // if (client) {
     currentTime = millis();
     previousTime = currentTime;
     Serial.println("New Client.");
@@ -159,7 +159,7 @@ void loop() {
         }
       }
       }
-      }
+      // }
 
     reconnect();
     delay(100);
