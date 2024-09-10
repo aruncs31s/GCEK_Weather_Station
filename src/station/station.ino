@@ -7,8 +7,8 @@
 #include "config.h"
 #include <WiFi.h>
 
-const char* ssid     = "802.11";
-const char* password = "12345678p";
+const char* ssid  = "GCEK-WiFi";
+const char* password = "";
 
 // Implement to take uint8_t
 
@@ -20,7 +20,7 @@ unsigned long previousTime = 0;
 const long timeoutTime = 2000;
 
 void check_wifi(){
-WiFi.begin(ssid,password);
+  WiFi.begin(ssid,password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -39,13 +39,20 @@ Data Message;
 humidTempSensor Humid_Temp_Sensor;
 
 weatherStation Weather_Station;
+void reconnect(){
+if ((WiFi.status()) != WL_CONNECTED ){
+  WiFi.disconnect();
+  delay(100);
+  WiFi.reconnect();
+}
+}
 
 void setup(){
   Serial.begin(9600);
   // Get static IP
-  IPAddress local_IP(192,168,237,5);
-  IPAddress gateway(192,168,237,1);
-  IPAddress subnet(255,255,255,0);
+  IPAddress local_IP(172,16,36,8);
+  IPAddress gateway(172,16,36,1);
+  IPAddress subnet(255,255,252,0);
   IPAddress primaryDNS(8,8,8,8);
   IPAddress secondaryDNS(8,8,8,8);
 
@@ -60,6 +67,9 @@ void setup(){
 }
 
 void loop() {
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
   Humid_Temp_Sensor.get_readings();
   Message.light_sensor_value = Light_Sensor.get_value();
   Message.temperature = Humid_Temp_Sensor.temperature;
@@ -149,4 +159,6 @@ void loop() {
       }
       }
       }
+
+    reconnect();
       }
