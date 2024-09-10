@@ -7,8 +7,8 @@
 #include "config.h"
 #include <WiFi.h>
 
-const char* ssid  = "GCEK-WiFi";
-const char* password = "";
+const char* ssid  = "802.11";
+const char* password = "12345678p";
 
 // Implement to take uint8_t
 
@@ -50,9 +50,9 @@ if ((WiFi.status()) != WL_CONNECTED ){
 void setup(){
   Serial.begin(9600);
   // Get static IP
-  IPAddress local_IP(172,16,36,8);
-  IPAddress gateway(172,16,36,1);
-  IPAddress subnet(255,255,252,0);
+  IPAddress local_IP(192,168,230,5);
+  IPAddress gateway(192,168,230,1);
+  IPAddress subnet(255,255,255,0);
   IPAddress primaryDNS(8,8,8,8);
   IPAddress secondaryDNS(8,8,8,8);
 
