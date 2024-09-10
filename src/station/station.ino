@@ -41,9 +41,10 @@ humidTempSensor Humid_Temp_Sensor;
 weatherStation Weather_Station;
 void reconnect(){
 if ((WiFi.status()) != WL_CONNECTED ){
+  Serial.println("Reconnecting .");
   WiFi.disconnect();
-  delay(1000);
   WiFi.reconnect();
+  delay(5000);
 }
 }
 
@@ -161,4 +162,5 @@ void loop() {
       }
 
     reconnect();
+    delay(100);
       }
