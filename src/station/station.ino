@@ -4,6 +4,7 @@
 #include "light_sensor.h"
 #include "humid_temp_sensor.h"
 #include "weather_station.h"
+#include "battery_monitor.h"
 #include "config.h"
 #include <WiFi.h>
 
@@ -33,8 +34,9 @@ void check_wifi(){
 
 lightSensor Light_Sensor;
 
+Data new_data;
 
-Data Message;
+BatteryMonitor battery_monitor;
 
 humidTempSensor Humid_Temp_Sensor;
 
@@ -51,8 +53,8 @@ if ((WiFi.status()) != WL_CONNECTED ){
 void setup(){
   Serial.begin(9600);
   // Get static IP
-  IPAddress local_IP(192,168,230,5);
-  IPAddress gateway(192,168,230,1);
+  IPAddress local_IP(192,168,13,5);
+  IPAddress gateway(192,168,13,1);
   IPAddress subnet(255,255,255,0);
   IPAddress primaryDNS(8,8,8,8);
   IPAddress secondaryDNS(8,8,8,8);
@@ -72,16 +74,16 @@ void loop() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
   Humid_Temp_Sensor.get_readings();
-  Message.light_sensor_value = Light_Sensor.get_value();
-  Message.temperature = Humid_Temp_Sensor.temperature;
-  Message.humidity = Humid_Temp_Sensor.humidity;
-  Message.wind_speed = Weather_Station.get_speed();
-  Message.wind_direction = Weather_Station.get_direction();
-  Message.rain_volume = Weather_Station.get_rain();
+  new_data.light_sensor_value = Light_Sensor.get_value();
+  new_data.temperature = Humid_Temp_Sensor.temperature;
+  new_data.humidity = Humid_Temp_Sensor.humidity;
+  new_data.wind_speed = Weather_Station.get_speed();
+  new_data.wind_direction = Weather_Station.get_direction();
+  new_data.rain_volume = Weather_Station.get_rain();
 
   WiFiClient client = server.available();
 
-  // if (client) {
+  if (client) {
     currentTime = millis();
     previousTime = currentTime;
     Serial.println("New Client.");
@@ -100,12 +102,12 @@ void loop() {
               client.println("Connection: close");
               client.println();
               client.print("{");
-              client.print("\"temperature\":"); client.print(Message.temperature); client.print(",");
-              client.print("\"humidity\":"); client.print(Message.humidity); client.print(",");
-              client.print("\"wind_speed\":"); client.print(Message.wind_speed); client.print(",");
-              client.print("\"wind_direction\":"); client.print(Message.wind_direction); client.print(",");
-              client.print("\"rain_volume\":"); client.print(Message.rain_volume); client.print(",");
-              client.print("\"light_sensor_value\":"); client.print(Message.light_sensor_value);
+              client.print("\"temperature\":"); client.print(new_data.temperature); client.print(",");
+              client.print("\"humidity\":"); client.print(new_data.humidity); client.print(",");
+              client.print("\"wind_speed\":"); client.print(new_data.wind_speed); client.print(",");
+              client.print("\"wind_direction\":"); client.print(new_data.wind_direction); client.print(",");
+              client.print("\"rain_volume\":"); client.print(new_data.rain_volume); client.print(",");
+              client.print("\"light_sensor_value\":"); client.print(new_data.light_sensor_value);
               client.println("}");
               client.println();
               break;
@@ -122,12 +124,12 @@ void loop() {
               client.println("</style></head>");
               client.println("<body><h1>GCEK Weather Station</h1>");
             client.println("<h3> Station IP :  " +  String(WiFi.localIP().toString()) +  "</h3>");
-              client.println("<p id='temperature'>Temperature: " + String(Message.temperature) + " (degree) C</p>");
-              client.println("<p id='humidity'>Humidity: " + String(Message.humidity) + " %</p>");
-              client.println("<p id='wind_speed'>Wind Speed: " + String(Message.wind_speed) + " kph </p>");
-              client.println("<p id='wind_direction'>Wind Direction: " + String(Message.wind_direction) + "(degrees) </p>");
-              client.println("<p id='rain_volume'>Total Rain Fall: " + String(Message.rain_volume) + " mm</p>");
-              client.println("<p id='light_intensity'>Light Intensity: " + String(Message.light_sensor_value) + "</p>");
+              client.println("<p id='temperature'>Temperature: " + String(new_data.temperature) + " (degree) C</p>");
+              client.println("<p id='humidity'>Humidity: " + String(new_data.humidity) + " %</p>");
+              client.println("<p id='wind_speed'>Wind Speed: " + String(new_data.wind_speed) + " kph </p>");
+              client.println("<p id='wind_direction'>Wind Direction: " + String(new_data.wind_direction) + "(degrees) </p>");
+              client.println("<p id='rain_volume'>Total Rain Fall: " + String(new_data.rain_volume) + " mm</p>");
+              client.println("<p id='light_intensity'>Light Intensity: " + String(new_data.light_sensor_value) + "</p>");
               client.println("<script>");
               client.println("setInterval(function() {");
               client.println("  var xhr = new XMLHttpRequest();");
@@ -159,8 +161,8 @@ void loop() {
         }
       }
       }
-      // }
-
+      }
+  client.stop();
     reconnect();
     delay(100);
       }

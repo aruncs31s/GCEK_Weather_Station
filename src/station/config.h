@@ -10,6 +10,7 @@ typedef struct Data {
   float humidity;
   float temperature;
   float rain_volume;
+
 } Data;
 
 #endif //!__CONFIG_H_
