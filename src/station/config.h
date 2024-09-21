@@ -3,6 +3,7 @@
 
 #include <stdint.h> // Required for uint8_t
 
+// To store Sensor data
 typedef struct Data {
   float light_sensor_value;
   float wind_speed;
@@ -10,6 +11,7 @@ typedef struct Data {
   float humidity;
   float temperature;
   float rain_volume;
+  float battery_voltage;
 
 } Data;
 

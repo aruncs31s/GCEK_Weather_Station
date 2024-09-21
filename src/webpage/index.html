@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <style>
+      html {
+        font-family: Helvetica;
+        display: inline-block;
+        margin: 0px auto;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>GCEK Weather Station</h1>
+    <h3>Station IP: <span id="stationIP"></span></h3>
+    <p id="temperature">
+      Temperature: <span id="temperatureValue"></span> (degree) C
+    </p>
+    <p id="humidity">Humidity: <span id="humidityValue"></span> %</p>
+    <p id="wind_speed">Wind Speed: <span id="windSpeedValue"></span> kph</p>
+    <p id="wind_direction">
+      Wind Direction: <span id="windDirectionValue"></span> (degrees)
+    </p>
+    <p id="rain_volume">
+      Total Rain Fall: <span id="rainVolumeValue"></span> mm
+    </p>
+    <p id="light_intensity">
+      Light Intensity: <span id="lightIntensityValue"></span>
+    </p>
+    <p id="battery_voltage">
+      Battery Voltage: <span id="batteryVoltageValue"></span>
+    </p>
+
+    <canvas id="sensorChart" width="400" height="200"></canvas>
+    <script>
+      const ctx = document.getElementById("sensorChart").getContext("2d");
+      const sensorChart = new Chart(ctx, {
+        type: "line", // or 'bar', 'radar', etc.
+        data: {
+          labels: [], // Array to hold time labels or data points
+          datasets: [
+            {
+              label: "Temperature (°C)", // Change label based on sensor value
+              data: [], // Array to hold sensor values
+              borderColor: "rgba(75, 192, 192, 1)",
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      setInterval(function () {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            var data = JSON.parse(xhr.responseText);
+
+            // Update sensor values
+            document.getElementById("temperatureValue").textContent =
+              data.temperature;
+
+            // Update chart data
+            sensorChart.data.labels.push(new Date().toLocaleTimeString()); // Add current time
+            sensorChart.data.datasets[0].data.push(data.temperature); // Add temperature value
+
+            // Limit the number of data points
+            if (sensorChart.data.labels.length > 10) {
+              sensorChart.data.labels.shift(); // Remove the first label
+              sensorChart.data.datasets[0].data.shift(); // Remove the first data point
+            }
+
+            sensorChart.update(); // Refresh the chart
+          }
+        };
+        xhr.open("GET", "/data", true);
+        xhr.send();
+      }, 5000);
+      // Set the station IP
+      document.getElementById("stationIP").textContent = String(
+        WiFi.localIP().toString(),
+      );
+
+      setInterval(function () {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            var data = JSON.parse(xhr.responseText);
+
+            document.getElementById("temperatureValue").textContent =
+              data.temperature;
+            document.getElementById("humidityValue").textContent =
+              data.humidity;
+            document.getElementById("windSpeedValue").textContent =
+              data.wind_speed;
+            document.getElementById("windDirectionValue").textContent =
+              data.wind_direction;
+            document.getElementById("rainVolumeValue").textContent =
+              data.rain_volume;
+            document.getElementById("lightIntensityValue").textContent =
+              data.light_sensor_value;
+            document.getElementById("batteryVoltageValue").textContent =
+              data.battery_voltage;
+          }
+        };
+        xhr.open("GET", "/data", true);
+        xhr.send();
+      }, 5000);
+    </script>
+  </body>
+</html>
