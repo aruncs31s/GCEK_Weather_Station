@@ -36,7 +36,6 @@ void setup() {
   Weather_Station.init();
   Light_Sensor.begin();
   Humid_Temp_Sensor.begin();
-
   // Start Server
   server.begin();
 }
@@ -54,13 +53,18 @@ void loop() {
   new_data.rain_volume = Weather_Station.get_rain();
   new_data.battery_voltage = battery_monitor.get_voltage(ADC_PIN);
 
+// Create Client Object
   WiFiClient client = server.available();
-
+  // Check if client is connected
   if (client) {
+  // Get Current time for comparison 
     currentTime = millis();
+    // Used to track how long the client has been connectedj
     previousTime = currentTime;
-    Serial.println("New Client.");
     String currentLine = "";
+
+// Check if the client is connected and the time is less than the timeout time
+// To ensure the client is connected 
     while (client.connected() && currentTime - previousTime <= timeoutTime) {
       currentTime = millis();
       if (client.available()) {
@@ -166,7 +170,6 @@ void loop() {
               client.println("  xhr.send();");
               client.println("}, 5000);");
               client.println("</script>");
-
               client.println("</body></html>");
               client.println();
               break;

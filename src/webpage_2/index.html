@@ -1,0 +1,305 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <style>
+      body {
+        min-width: 310px;
+        max-width: 800px;
+        height: 400px;
+        margin: 0 auto;
+      }
+      h2 {
+        font-family: Arial;
+        font-size: 2.5rem;
+        text-align: center;
+      }
+      .continer #chart-temperature {
+        float: right;
+      }
+      .continer #humidity {
+        float: left;
+      }
+      .float-container {
+        border: 3px solid #fff;
+        padding: 20px;
+      }
+
+      .float-left {
+        width: 33%;
+        float: left;
+        /* padding: 50rem; */
+        /* border: 2px solid red; */
+      }
+      .float-right {
+        width: 33%;
+        float: right;
+        /* padding: 20px; */
+        /* border: 2px solid red; */
+      }
+      .float-center {
+        width: 33%;
+        float: center;
+        /* padding: 20px; */
+        /* border: 2px solid red; */
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Kannur Weather Station</h2>
+    <div class="float-container">
+      <div class="float-left" id="chart-temperature"></div>
+      <div class="float-center" id="chart-humidity"></div>
+      <div class="float-right" id="chart-pressure"></div>
+      <div class="float-left" id="chart-altitude"></div>
+      <div class="float-center" id="chart-gas"></div>
+    </div>
+    <div class="sensor-datas">
+      <summary>
+        Sensor Datas:
+        <details>
+          <p id="temperature">
+            Temperature: <span id="temperatureValue"></span> (degree) C
+          </p>
+          <p id="humidity">Humidity: <span id="humidityValue"></span> %</p>
+          <p id="wind_speed">
+            Wind Speed: <span id="windSpeedValue"></span> kph
+          </p>
+          <p id="wind_direction">
+            Wind Direction: <span id="windDirectionValue"></span> (degrees)
+          </p>
+          <p id="rain_volume">
+            Total Rain Fall: <span id="rainVolumeValue"></span> mm
+          </p>
+          <p id="light_intensity">
+            Light Intensity: <span id="lightIntensityValue"></span>
+          </p>
+          <p id="battery_voltage">
+            Battery Voltage: <span id="batteryVoltageValue"></span>
+          </p>
+        </details>
+      </summary>
+    </div>
+  </body>
+  <script>
+    var chartT = new Highcharts.Chart({
+      chart: { renderTo: "chart-temperature" },
+      title: { text: "Temperature" },
+      series: [
+        {
+          showInLegend: false,
+          data: [],
+        },
+      ],
+      plotOptions: {
+        line: { animation: false, dataLabels: { enabled: true } },
+        series: { color: "#059e8a" },
+      },
+      xAxis: { type: "datetime", dateTimeLabelFormats: { second: "%H:%M:%S" } },
+      yAxis: {
+        title: { text: "Temperature (Celsius)" },
+        //title: { text: 'Temperature (Fahrenheit)' }
+      },
+      credits: { enabled: false },
+    });
+
+    setInterval(function () {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          var x = new Date().getTime(),
+            y = parseFloat(this.responseText);
+          //console.log(this.responseText);
+          if (chartT.series[0].data.length > 40) {
+            chartT.series[0].addPoint([x, y], true, true, true);
+          } else {
+            chartT.series[0].addPoint([x, y], true, false, true);
+          }
+        }
+      };
+      xhttp.open("GET", "/data", true);
+      xhttp.send();
+    }, 30000);
+
+    var chartH = new Highcharts.Chart({
+      chart: { renderTo: "chart-humidity" },
+      title: { text: "Humidity" },
+      series: [
+        {
+          showInLegend: false,
+          data: [],
+        },
+      ],
+      plotOptions: {
+        line: { animation: false, dataLabels: { enabled: true } },
+      },
+      xAxis: {
+        type: "datetime",
+        dateTimeLabelFormats: { second: "%H:%M:%S" },
+      },
+      yAxis: {
+        title: { text: "Humidity (%)" },
+      },
+      credits: { enabled: false },
+    });
+    setInterval(function () {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          var x = new Date().getTime(),
+            y = parseFloat(this.responseText);
+          //console.log(this.responseText);
+          if (chartH.series[0].data.length > 40) {
+            chartH.series[0].addPoint([x, y], true, true, true);
+          } else {
+            chartH.series[0].addPoint([x, y], true, false, true);
+          }
+        }
+      };
+      xhttp.open("GET", "/data", true);
+      xhttp.send();
+    }, 30000);
+
+    var chartP = new Highcharts.Chart({
+      chart: { renderTo: "chart-pressure" },
+      title: { text: "Pressure" },
+      series: [
+        {
+          showInLegend: false,
+          data: [],
+        },
+      ],
+      plotOptions: {
+        line: { animation: false, dataLabels: { enabled: true } },
+        series: { color: "#18009c" },
+      },
+      xAxis: {
+        type: "datetime",
+        dateTimeLabelFormats: { second: "%H:%M:%S" },
+      },
+      yAxis: {
+        title: { text: "Pressure (hPa)" },
+      },
+      credits: { enabled: false },
+    });
+    setInterval(function () {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          var x = new Date().getTime(),
+            y = parseFloat(this.responseText);
+          //console.log(this.responseText);
+          if (chartP.series[0].data.length > 40) {
+            chartP.series[0].addPoint([x, y], true, true, true);
+          } else {
+            chartP.series[0].addPoint([x, y], true, false, true);
+          }
+        }
+      };
+      xhttp.open("GET", "/data", true);
+      xhttp.send();
+    }, 30000);
+
+    var chartA = new Highcharts.Chart({
+      chart: { renderTo: "chart-altitude" },
+      title: { text: "Altitude" },
+      series: [
+        {
+          showInLegend: false,
+          data: [],
+        },
+      ],
+      plotOptions: {
+        line: { animation: false, dataLabels: { enabled: true } },
+        series: { color: "#059e8a" },
+      },
+      xAxis: { type: "datetime", dateTimeLabelFormats: { second: "%H:%M:%S" } },
+      yAxis: {
+        title: { text: "Altitude (m)" },
+        //title: { text: 'Temperature (Fahrenheit)' }
+      },
+      credits: { enabled: false },
+    });
+    setInterval(function () {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          var x = new Date().getTime(),
+            y = parseFloat(this.responseText);
+          //console.log(this.responseText);
+          if (chartA.series[0].data.length > 40) {
+            chartA.series[0].addPoint([x, y], true, true, true);
+          } else {
+            chartA.series[0].addPoint([x, y], true, false, true);
+          }
+        }
+      };
+      xhttp.open("GET", "/data", true);
+      xhttp.send();
+    }, 30000);
+
+    var chartG = new Highcharts.Chart({
+      chart: { renderTo: "chart-gas" },
+      title: { text: "Gas" },
+      series: [
+        {
+          showInLegend: false,
+          data: [],
+        },
+      ],
+      plotOptions: {
+        line: { animation: false, dataLabels: { enabled: true } },
+      },
+      xAxis: {
+        type: "datetime",
+        dateTimeLabelFormats: { second: "%H:%M:%S" },
+      },
+      yAxis: {
+        title: { text: "Gas (KOhm)" },
+      },
+      credits: { enabled: false },
+    });
+    setInterval(function () {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+          var data = JSON.parse(xhr.responseText);
+
+          document.getElementById("temperatureValue").textContent =
+            data.temperature;
+          document.getElementById("humidityValue").textContent = data.humidity;
+          document.getElementById("windSpeedValue").textContent =
+            data.wind_speed;
+          document.getElementById("windDirectionValue").textContent =
+            data.wind_direction;
+          document.getElementById("rainVolumeValue").textContent =
+            data.rain_volume;
+          document.getElementById("lightIntensityValue").textContent =
+            data.light_sensor_value;
+          document.getElementById("batteryVoltageValue").textContent =
+            data.battery_voltage;
+        }
+      };
+      xhr.open("GET", "/data", true);
+      xhr.send();
+
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          var x = new Date().getTime(),
+            y = parseFloat(this.responseText);
+          //console.log(this.responseText);
+          if (chartG.series[0].data.length > 40) {
+            chartG.series[0].addPoint([x, y], true, true, true);
+          } else {
+            chartG.series[0].addPoint([x, y], true, false, true);
+          }
+        }
+      };
+      xhttp.open("GET", "/data", true);
+      xhttp.send();
+    }, 30000);
+  </script>
+</html>

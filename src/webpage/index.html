@@ -15,6 +15,7 @@
   </head>
   <body>
     <h1>GCEK Weather Station</h1>
+    <canvas id="sensorChart" width="400" height="200"></canvas>
     <h3>Station IP: <span id="stationIP"></span></h3>
     <p id="temperature">
       Temperature: <span id="temperatureValue"></span> (degree) C
@@ -33,8 +34,6 @@
     <p id="battery_voltage">
       Battery Voltage: <span id="batteryVoltageValue"></span>
     </p>
-
-    <canvas id="sensorChart" width="400" height="200"></canvas>
     <script>
       const ctx = document.getElementById("sensorChart").getContext("2d");
       const sensorChart = new Chart(ctx, {
