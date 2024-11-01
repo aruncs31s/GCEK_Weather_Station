@@ -24,8 +24,14 @@ class BatteryMonitor {
 
 public:
   int get_adc_value();
+  //@param -> adc_pin is the pin where the solar battery input is connected
+  //@return -> the actual value of input voltage
+  //@logic -> 1. Using a voltage devider we split the voltage to below 3.3 so
+  // the esp32 can measure
+  //          2. I used 0.965:5.495 also 0.965k ohm as the Rb and 4.530 as Ra
+
   float get_adc_voltage();
-  // Returns the actual_voltage
+  // Returns the voltage across adc pin and the GND
   float get_voltage(int adc_pin);
   float get_devider_current();
 
